@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 10px;
+        position: relative;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+      .background-image {
+        position: absolute;
+        top: 10px;  /* Adjust this value to push it more or less */
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('https://images.squarespace-cdn.com/content/v1/60a3e4977dbfad2879614ea3/389e9ebd-2c8a-4660-b63e-12ffd2aaea94/favicon.ico?format=100w');
+        background-repeat: no-repeat;
+        background-position: top right;  /* Center horizontally and push to the top */
+        background-size: 60px;  /* Adjust this value to make it smaller */
+        opacity: 1;
+        z-index: -1;
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+      input, select {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #status {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background-image"></div>
+    <div class="content">
+      <h2>Messaging App</h2>
+      <label for="phoneColumn">Phone Number Column:</label>
+      <input type="text" id="phoneColumn" placeholder="e.g., A">
+      
+      <label for="messageColumn">Message Column:</label>
+      <input type="text" id="messageColumn" placeholder="e.g., B">
+      
+      <label for="statusColumn">Status Column:</label>
+      <input type="text" id="statusColumn" placeholder="e.g., C">
+      
+      <label for="startingRow">Starting Row:</label>
+      <input type="number" id="startingRow" placeholder="e.g., 2">
+      
+      <button onclick="saveSettings()">Save Settings</button>
+      <button onclick="sendMessages()">Send Messages</button>
+      <button onclick="testCredentials()">Test Credentials</button>
+      <button onclick="getHelp()">Get Help</button>
+      
+      <div id="status"></div>
+    </div>
+
+    <script>
+      function saveSettings() {
+        var settings = {
+          phoneColumn: document.getElementById('phoneColumn').value,
+          messageColumn: document.getElementById('messageColumn').value,
+          statusColumn: document.getElementById('statusColumn').value,
+          startingRow: document.getElementById('startingRow').value
+        };
+        
+        google.script.run
+          .withSuccessHandler(updateStatus)
+          .withFailureHandler(showError)
+          .saveSettings(settings);
+      }
+
+      function sendMessages() {
+        document.getElementById('status').innerHTML = 'Sending messages...';
+        google.script.run
+          .withSuccessHandler(updateStatus)
+          .withFailureHandler(showError)
+          .sendMessages();
+      }
+
+      function testCredentials() {
+        document.getElementById('status').innerHTML = 'Testing credentials...';
+        google.script.run
+          .withSuccessHandler(updateStatus)
+          .withFailureHandler(showError)
+          .testAfricasTalkingCredentials();
+      }
+
+      function updateStatus(result) {
+        document.getElementById('status').innerHTML = result;
+      }
+
+      function showError(error) {
+        document.getElementById('status').innerHTML = 'Error: ' + error.message;
+      }
+
+      function getHelp() {
+        google.script.run
+          .withSuccessHandler(function(helpInfo) {
+            var helpMessage = "For assistance, please contact:\n\n" +
+                              "Name: " + helpInfo.name + "\n" +
+                              "Email: " + helpInfo.email + "\n" +
+                              "Phone: " + helpInfo.phone;
+            alert(helpMessage);
+          })
+          .withFailureHandler(showError)
+          .getHelpInfo();
+      }
+
+      // Load saved settings when the sidebar opens
+      google.script.run.withSuccessHandler(function(settings) {
+        document.getElementById('phoneColumn').value = settings.phoneColumn || '';
+        document.getElementById('messageColumn').value = settings.messageColumn || '';
+        document.getElementById('statusColumn').value = settings.statusColumn || '';
+        document.getElementById('startingRow').value = settings.startingRow || '';
+      }).getSettings();
+
+      // Check if the image loaded successfully
+      window.addEventListener('load', function() {
+        var backgroundImage = new Image();
+        backgroundImage.onload = function() {
+          console.log('Background image loaded successfully');
+        };
+        backgroundImage.onerror = function() {
+          console.error('Failed to load background image');
+          document.getElementById('status').innerHTML = 'Warning: Failed to load background image';
+        };
+        backgroundImage.src = 'https://images.squarespace-cdn.com/content/v1/60a3e4977dbfad2879614ea3/389e9ebd-2c8a-4660-b63e-12ffd2aaea94/favicon.ico?format=100w';
+      });
+    </script>
+  </body>
+</html>
+
