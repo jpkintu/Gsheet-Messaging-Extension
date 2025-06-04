@@ -154,10 +154,11 @@ function sendMessages() {
 }
 
 function getHelpInfo() {
+  var credentials = getCredentials();
   return {
-    name: "JP Kintu",
-    email: "johnpaul@upenergygroup.com",
-    phone: "+256703695413"
+    name: credentials.NAME,
+    email: credentials.EMAIL,
+    phone: credentials.TEST_NUMBER
   };
 }
 
@@ -175,7 +176,7 @@ function testAfricasTalkingCredentials() {
     'method': 'post',
     'payload': {
       'username': credentials.USERNAME,
-      'to': '+256786049121', // Use a valid test number
+      'to': credentials.TEST_NUMBER, // Use a valid test number
       'message': 'This is a test message'
     },
     'headers': {
